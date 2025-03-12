@@ -1,0 +1,19 @@
+[package]
+name = "user-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4.4.0"
+workanda-models = { path = "../C:/Users/hp/New folder/workanda/src/workanda-models" }
+sqlx = { version = "0.8.3", features = ["postgres", "runtime-tokio-native-tls"] }
+tokio = { version = "1.0", features = ["full"] }
+argon2 = "0.5"
+paseto = "2.0.2+1.0.3"
+redis = "0.29.0"
+uuid = { version = "1.4", features = ["v4", "serde"] }
+chrono = "0.4.39"
+serde = { version = "1.0.218", features = ["derive"] }
+derive_more = "2.0.1"
+rand = "0.9.0"
+totp = "0.3.0"

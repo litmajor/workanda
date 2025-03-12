@@ -1,0 +1,16 @@
+// workanda-models/proto/events.proto
+syntax = "proto3";
+
+package workanda.events;
+
+message ProjectCreated {
+  string project_id = 1;
+  string client_id = 2;
+  string title = 3;
+  int64 created_at = 4;
+}
+
+message ProjectAssigned {
+  string project_id = 1;
+  repeated string freelancer_ids = 2;
+}
