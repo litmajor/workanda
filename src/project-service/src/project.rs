@@ -2,7 +2,7 @@ use sqlx::{PgPool, query, query_as, Error};
 use chrono::{Utc, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 use crate::models::{ProjectTemplate, Project};
-use tokio::task
+use tokio::task;
 
 use std::collections::HashMap;
 
@@ -28,6 +28,7 @@ pub struct Project {
     pub priority: Option<i32>,
     pub communication_channels: Option<Vec<String>>,
     pub enable_milestones: bool,
+    pub milestones: Vec<Milestones>,
     pub contract_id: Option<u32>,
 }
 
