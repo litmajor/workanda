@@ -61,6 +61,48 @@ pub struct ProjectDetails {
     pub updated_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Milestone {
+    pub id: i32,
+    pub project_id: i32,
+    pub name: String,
+    pub description: Option<String>,
+    pub due_date: Option<DateTime<Utc>>,
+    pub completed: bool,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Workflow {
+    pub id: i32,
+    pub name: String,
+    pub description: Option<String>,
+    pub project_id: i32,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WorkflowStage {
+    pub id: i32,
+    pub workflow_id: i32,
+    pub name: String,
+    pub description: Option<String>,
+    pub order: i32,
+    pub status: WorkflowStageStatus,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum WorkflowStageStatus {
+    NotStarted,
+    InProgress,
+    Completed,
+    Skipped,
+}
+
 impl Project {
     pub async fn create(pool: &PgPool, name: &str, budget: Option<f64>, client_id: Option<i32>) -> Result<Project, sqlx::Error> {
         let new_project = Project {
