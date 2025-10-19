@@ -14,6 +14,8 @@ pub mod milestone;
 pub mod payment;
 pub mod admin;
 pub mod review;
+pub mod team;
+pub mod agency;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(auth::routes::config);
@@ -28,6 +30,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(job::routes::config);
     cfg.service(proposal::routes::config);
     cfg.service(review::routes::config);
+    team::routes::config(cfg);
+    agency::routes::config(cfg);
 }
 
 pub use self::auth::*;

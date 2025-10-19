@@ -7,6 +7,8 @@ pub mod payment;
 pub mod escrow;
 pub mod review;
 pub mod message;
+pub mod team_proposal;
+pub mod revenue_distribution;
 
 pub use self::user::*;
 pub use self::job::*;
@@ -17,3 +19,5 @@ pub use self::payment::*;
 pub use self::escrow::*;
 pub use self::review::*;
 pub use self::message::*;
+pub use self::team_proposal::*;
+pub use self::revenue_distribution::*;
