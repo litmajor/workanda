@@ -1,4 +1,4 @@
-modules = ["rust-stable", "nodejs-20", "rust-latest"]
+modules = ["rust-stable", "nodejs-20", "rust-latest", "postgresql-16"]
 [agent]
 expertMode = true
 
