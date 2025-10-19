@@ -1,13 +1,11 @@
-use actix_web::{web, App, HttpServer, Responder, HttpResponse};
-use rdkafka::{ClientConfig, producer::{FutureProducer, FutureRecord}};
-use serde::Serialize;
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::sync::Mutex;
+use actix_web::{web, App, HttpServer, HttpResponse, middleware::Logger};
+use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use chrono::Utc;
+use dotenv::dotenv;
+use env_logger::Env;
 
-#[derive(Serialize)]
+#[derive(Deserialize)]
 struct ProjectCreateRequest {
     client_id: String,
     title: String,
@@ -16,59 +14,67 @@ struct ProjectCreateRequest {
 #[derive(Serialize)]
 struct ProjectResponse {
     project_id: String,
+    message: String,
 }
 
 #[derive(Serialize)]
-struct ProjectCreated {
-    project_id: String,
-    client_id: String,
-    title: String,
-    created_at: i64,
+struct HealthResponse {
+    status: String,
+    timestamp: i64,
+}
+
+async fn health_check() -> HttpResponse {
+    HttpResponse::Ok().json(HealthResponse {
+        status: "healthy".to_string(),
+        timestamp: Utc::now().timestamp(),
+    })
 }
 
 async fn create_project(
-    producer: web::Data<Arc<Mutex<FutureProducer>>>,
     item: web::Json<ProjectCreateRequest>,
-) -> impl Responder {
+) -> HttpResponse {
     let project_id = Uuid::new_v4().to_string();
     
-    // Create event
-    let event = ProjectCreated {
-        project_id: project_id.clone(),
-        client_id: item.client_id.clone(),
-        title: item.title.clone(),
-        created_at: Utc::now().timestamp(),
-    };
+    log::info!(
+        "Creating project '{}' for client '{}' with ID: {}",
+        item.title,
+        item.client_id,
+        project_id
+    );
 
-    // Serialize event to bytes
-    let bytes = serde_json::to_vec(&event).unwrap();
-    let record = FutureRecord::to("projects.created")
-        .key(&project_id)
-        .payload(&bytes);
-
-    // Send event to Kafka
-    let producer = producer.lock().await;
-    producer.send(record, Duration::from_secs(3)).await.unwrap();
-
-    // Return response
-    HttpResponse::Ok().json(ProjectResponse { project_id })
+    HttpResponse::Ok().json(ProjectResponse {
+        project_id,
+        message: "Project created successfully".to_string(),
+    })
 }
 
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    let producer: FutureProducer = ClientConfig::new()
-        .set("bootstrap.servers", "localhost:9092")
-        .create()
-        .expect("Producer creation error");
+async fn index() -> HttpResponse {
+    HttpResponse::Ok().json(serde_json::json!({
+        "name": "Workanda API",
+        "version": "0.1.0",
+        "description": "The Future of Freelancing – Secure, Transparent, and Empowering",
+        "endpoints": {
+            "health": "/health",
+            "create_project": "POST /projects"
+        }
+    }))
+}
 
-    let producer = Arc::new(Mutex::new(producer));
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+
+    log::info!("Starting Workanda API server on 0.0.0.0:5000");
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(producer.clone()))
+            .wrap(Logger::default())
+            .route("/", web::get().to(index))
+            .route("/health", web::get().to(health_check))
             .route("/projects", web::post().to(create_project))
     })
-    .bind("0.0.0.0:8001")?
+    .bind("0.0.0.0:5000")?
     .run()
     .await
 }
