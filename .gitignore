@@ -1,2 +1,27 @@
+# Rust
 /target
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# Environment
 /env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Replit
+.replit
+.upm/
+.cache/
+.config/
+
+# OS
+.DS_Store
+Thumbs.db
