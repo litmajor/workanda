@@ -5,6 +5,8 @@ use chrono::{DateTime, Utc};
 use reqwest;
 use std::collections::HashMap;
 use crate::services::wallet::wallet_service::WalletError;
+use rust_decimal::Decimal;
+use rust_decimal::prelude::FromStrExact;
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct ExchangeRate {
@@ -26,6 +28,32 @@ pub struct ConversionResult {
     pub timestamp: DateTime<Utc>,
 }
 
+#[derive(Debug)]
+pub enum ApiError {
+    ReqwestError(reqwest::Error),
+    IoError(std::io::Error),
+    DatabaseError(String),
+    ParseError(String),
+}
+
+impl From<reqwest::Error> for ApiError {
+    fn from(err: reqwest::Error) -> Self {
+        ApiError::ReqwestError(err)
+    }
+}
+
+impl From<std::io::Error> for ApiError {
+    fn from(err: std::io::Error) -> Self {
+        ApiError::IoError(err)
+    }
+}
+
+impl From<String> for ApiError {
+    fn from(err: String) -> Self {
+        ApiError::DatabaseError(err)
+    }
+}
+
 pub struct ExchangeRateService {
     pool: PgPool,
 }
@@ -35,13 +63,13 @@ impl ExchangeRateService {
         Self { pool }
     }
 
-    pub async fn update_exchange_rate(
+    pub async fn update_rate(
         &self,
         base: &str,
         quote: &str,
         rate: rust_decimal::Decimal,
         source: &str,
-    ) -> Result<(), WalletError> {
+    ) -> Result<(), ApiError> {
         sqlx::query!(
             r#"
             INSERT INTO exchange_rates (base_currency, quote_currency, rate, source)
@@ -56,7 +84,7 @@ impl ExchangeRateService {
         )
         .execute(&self.pool)
         .await
-        .map_err(|e| WalletError::DatabaseError(format!("Failed to update exchange rate: {}", e)))?;
+        .map_err(|e| ApiError::DatabaseError(format!("Failed to update exchange rate: {}", e)))?;
 
         Ok(())
     }
@@ -65,7 +93,7 @@ impl ExchangeRateService {
         &self,
         base: &str,
         quote: &str,
-    ) -> Result<Option<ExchangeRate>, WalletError> {
+    ) -> Result<Option<ExchangeRate>, ApiError> {
         let rate = sqlx::query_as!(
             ExchangeRate,
             r#"
@@ -80,7 +108,7 @@ impl ExchangeRateService {
         )
         .fetch_optional(&self.pool)
         .await
-        .map_err(|e| WalletError::DatabaseError(format!("Failed to fetch exchange rate: {}", e)))?;
+        .map_err(|e| ApiError::DatabaseError(format!("Failed to fetch exchange rate: {}", e)))?;
 
         Ok(rate)
     }
@@ -90,7 +118,7 @@ impl ExchangeRateService {
         from_currency: &str,
         to_currency: &str,
         amount: f64,
-    ) -> Result<ConversionResult, WalletError> {
+    ) -> Result<ConversionResult, ApiError> {
         if from_currency == to_currency {
             return Ok(ConversionResult {
                 from_currency: from_currency.to_string(),
@@ -103,7 +131,7 @@ impl ExchangeRateService {
         }
 
         let rate_record = self.get_exchange_rate(from_currency, to_currency).await?;
-        
+
         let rate = match rate_record {
             Some(r) => r.rate.to_string().parse::<f64>().unwrap_or(1.0),
             None => {
@@ -127,7 +155,7 @@ impl ExchangeRateService {
         &self,
         from: &str,
         to: &str,
-    ) -> Result<f64, WalletError> {
+    ) -> Result<f64, ApiError> {
         let mock_rates: HashMap<(&str, &str), f64> = [
             (("USD", "EUR"), 0.92),
             (("USD", "GBP"), 0.79),
@@ -159,12 +187,12 @@ impl ExchangeRateService {
         let rate_decimal = rust_decimal::Decimal::from_f64_retain(rate)
             .unwrap_or(rust_decimal::Decimal::new(1, 0));
 
-        self.update_exchange_rate(from, to, rate_decimal, "mock_api").await?;
+        self.update_rate(from, to, rate_decimal, "mock_api").await?;
 
         Ok(rate)
     }
 
-    pub async fn get_all_rates(&self) -> Result<Vec<ExchangeRate>, WalletError> {
+    pub async fn get_all_rates(&self) -> Result<Vec<ExchangeRate>, ApiError> {
         let rates = sqlx::query_as!(
             ExchangeRate,
             r#"
@@ -176,12 +204,12 @@ impl ExchangeRateService {
         )
         .fetch_all(&self.pool)
         .await
-        .map_err(|e| WalletError::DatabaseError(format!("Failed to fetch rates: {}", e)))?;
+        .map_err(|e| ApiError::DatabaseError(format!("Failed to fetch rates: {}", e)))?;
 
         Ok(rates)
     }
 
-    pub async fn refresh_all_rates(&self) -> Result<(), WalletError> {
+    pub async fn refresh_all_rates(&self) -> Result<(), ApiError> {
         let currency_pairs = vec![
             ("USD", "EUR"), ("USD", "GBP"), ("USD", "NGN"), ("USD", "KES"),
             ("USD", "ZAR"), ("USD", "GHS"), ("USD", "UGX"),
@@ -192,6 +220,150 @@ impl ExchangeRateService {
 
         for (base, quote) in currency_pairs {
             self.fetch_and_cache_rate(base, quote).await?;
+        }
+
+        Ok(())
+    }
+
+    /// Fetch current exchange rates from CoinGecko API
+    pub async fn fetch_current_rates(&self) -> Result<(), ApiError> {
+        // CoinGecko free API endpoint
+        let coingecko_api = "https://api.coingecko.com/api/v3/simple/price";
+
+        // Fetch crypto prices
+        let crypto_ids = "celo,bitcoin,ethereum,tether,usd-coin";
+        let vs_currencies = "usd,eur";
+
+        let url = format!(
+            "{}?ids={}&vs_currencies={}",
+            coingecko_api, crypto_ids, vs_currencies
+        );
+
+        match reqwest::get(&url).await {
+            Ok(response) => {
+                if let Ok(data) = response.json::<serde_json::Value>().await {
+                    // Parse CELO prices
+                    if let Some(celo) = data.get("celo") {
+                        if let Some(usd) = celo.get("usd").and_then(|v| v.as_f64()) {
+                            self.update_rate(
+                                "CELO",
+                                "USD",
+                                Decimal::from_f64_retain(usd).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+
+                            self.update_rate(
+                                "CELO",
+                                "cUSD",
+                                Decimal::from_f64_retain(usd).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+                        }
+
+                        if let Some(eur) = celo.get("eur").and_then(|v| v.as_f64()) {
+                            self.update_rate(
+                                "CELO",
+                                "EUR",
+                                Decimal::from_f64_retain(eur).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+
+                            self.update_rate(
+                                "CELO",
+                                "cEUR",
+                                Decimal::from_f64_retain(eur).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+                        }
+                    }
+
+                    // Parse BTC prices
+                    if let Some(btc) = data.get("bitcoin") {
+                        if let Some(usd) = btc.get("usd").and_then(|v| v.as_f64()) {
+                            self.update_rate(
+                                "BTC",
+                                "USD",
+                                Decimal::from_f64_retain(usd).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+                        }
+                    }
+
+                    // Parse ETH prices
+                    if let Some(eth) = data.get("ethereum") {
+                        if let Some(usd) = eth.get("usd").and_then(|v| v.as_f64()) {
+                            self.update_rate(
+                                "ETH",
+                                "USD",
+                                Decimal::from_f64_retain(usd).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+                        }
+                    }
+
+                    // Parse USDT prices
+                    if let Some(usdt) = data.get("tether") {
+                        if let Some(usd) = usdt.get("usd").and_then(|v| v.as_f64()) {
+                            self.update_rate(
+                                "USDT",
+                                "USD",
+                                Decimal::from_f64_retain(usd).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+                        }
+                    }
+
+                    // Parse USDC prices
+                    if let Some(usdc) = data.get("usd-coin") {
+                        if let Some(usd) = usdc.get("usd").and_then(|v| v.as_f64()) {
+                            self.update_rate(
+                                "USDC",
+                                "USD",
+                                Decimal::from_f64_retain(usd).unwrap_or(Decimal::ZERO),
+                                "coingecko"
+                            ).await?;
+                        }
+                    }
+                }
+            },
+            Err(e) => {
+                eprintln!("Failed to fetch exchange rates from CoinGecko: {}", e);
+                // Fall back to static rates if API fails
+                return self.fetch_fallback_rates().await;
+            }
+        }
+
+        // Add stablecoin pegs (1:1 ratios)
+        self.update_rate("USD", "cUSD", Decimal::ONE, "peg").await?;
+        self.update_rate("EUR", "cEUR", Decimal::ONE, "peg").await?;
+        self.update_rate("cUSD", "USDT", Decimal::ONE, "peg").await?;
+        self.update_rate("cUSD", "USDC", Decimal::ONE, "peg").await?;
+
+        // Add USD/EUR rate
+        self.update_rate("USD", "EUR", Decimal::from_str_exact("0.92").unwrap(), "ecb").await?;
+
+        Ok(())
+    }
+
+    /// Fallback rates if API is unavailable
+    async fn fetch_fallback_rates(&self) -> Result<(), ApiError> {
+        let rates = vec![
+            ("USD", "cUSD", Decimal::from_str_exact("1.0").unwrap()),
+            ("EUR", "cEUR", Decimal::from_str_exact("1.0").unwrap()),
+            ("USD", "EUR", Decimal::from_str_exact("0.92").unwrap()),
+            ("USD", "CELO", Decimal::from_str_exact("0.65").unwrap()),
+            ("cUSD", "CELO", Decimal::from_str_exact("0.65").unwrap()),
+            ("BTC", "USD", Decimal::from_str_exact("45000.0").unwrap()),
+            ("ETH", "USD", Decimal::from_str_exact("2500.0").unwrap()),
+            ("USDT", "USD", Decimal::from_str_exact("1.0").unwrap()),
+            ("USDC", "USD", Decimal::from_str_exact("1.0").unwrap()),
+            ("cUSD", "cEUR", Decimal::from_str_exact("0.92").unwrap()),
+            ("CELO", "USD", Decimal::from_str_exact("1.54").unwrap()),
+            ("CELO", "cUSD", Decimal::from_str_exact("1.54").unwrap()),
+        ];
+
+        for (base, quote, rate) in rates {
+            self.update_rate(base, quote, rate, "fallback").await?;
         }
 
         Ok(())

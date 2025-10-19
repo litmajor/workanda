@@ -21,6 +21,7 @@ import Reviews from './pages/Reviews'
 import AdminDashboard from './pages/AdminDashboard'
 import Progress from './pages/Progress';
 import Wallet from './pages/Wallet';
+import BlockchainWallet from './pages/BlockchainWallet';
 import { AppProvider } from './context/AppContext';
 import Settings from './pages/Settings'
 import Notifications from './pages/Notifications'
@@ -54,6 +55,7 @@ function App() {
                 <Link to="/dashboard" className="nav-link">Dashboard</Link>
                 <Link to="/escrow" className="nav-link">Payments</Link>
                 <Link to="/wallet" className="nav-link">Wallet</Link>
+                <Link to="/wallet/blockchain" className="nav-link">🔐 Crypto</Link>
                 <Link to="/trust-safety" className="nav-link">Trust & Safety</Link>
                 <Link to="/profile" className="nav-link">Profile</Link>
                 <ThemeToggle />
@@ -121,6 +123,7 @@ function App() {
             <Route path="/ai-matching" element={<AIMatching />} />
             <Route path="/proposal-assistant" element={<ProposalAssistant />} />
             <Route path="/wallet" element={<Wallet />} />
+            <Route path="/wallet/blockchain" element={<BlockchainWallet />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />

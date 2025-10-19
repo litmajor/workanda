@@ -1,20 +1,47 @@
 
 use rust_decimal::Decimal;
 use crate::api::error::ApiError;
+use std::env;
 
 /// Service for interacting with Celo blockchain
 pub struct CeloService {
     rpc_url: String,
     chain_id: u64,
+    is_mainnet: bool,
 }
 
 impl CeloService {
-    pub fn new(rpc_url: String, is_mainnet: bool) -> Self {
+    pub fn new(is_mainnet: bool) -> Self {
+        let rpc_url = if is_mainnet {
+            env::var("CELO_MAINNET_RPC")
+                .unwrap_or_else(|_| "https://forno.celo.org".to_string())
+        } else {
+            env::var("CELO_TESTNET_RPC")
+                .unwrap_or_else(|_| "https://alfajores-forno.celo-testnet.org".to_string())
+        };
+        
         let chain_id = if is_mainnet { 42220 } else { 44787 }; // Mainnet or Alfajores testnet
         
         Self {
             rpc_url,
             chain_id,
+            is_mainnet,
+        }
+    }
+    
+    pub fn get_rpc_url(&self) -> &str {
+        &self.rpc_url
+    }
+    
+    pub fn get_chain_id(&self) -> u64 {
+        self.chain_id
+    }
+    
+    pub fn get_explorer_url(&self) -> &str {
+        if self.is_mainnet {
+            "https://explorer.celo.org"
+        } else {
+            "https://alfajores.celoscan.io"
         }
     }
 
