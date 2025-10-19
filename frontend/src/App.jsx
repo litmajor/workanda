@@ -17,6 +17,11 @@ import Settings from './pages/Settings'
 import Notifications from './pages/Notifications'
 import Teams from './pages/Teams'
 import Analytics from './pages/Analytics'
+import AIMatching from './pages/AIMatching'
+import ProposalAssistant from './pages/ProposalAssistant'
+import FreelancerProfileSetup from './pages/FreelancerProfileSetup'
+import EscrowManagement from './pages/EscrowManagement'
+import TimeTracking from './pages/TimeTracking'
 import ThemeToggle from './components/ThemeToggle'
 import './App.css'
 
@@ -32,9 +37,9 @@ function App() {
             </Link>
             <div className="nav-links">
               <Link to="/jobs" className="nav-link">Browse Jobs</Link>
-              <Link to="/post-job" className="nav-link">Post Job</Link>
+              <Link to="/ai/matching" className="nav-link">AI Matching</Link>
               <Link to="/dashboard" className="nav-link">Dashboard</Link>
-              <Link to="/analytics" className="nav-link">Analytics</Link>
+              <Link to="/escrow" className="nav-link">Payments</Link>
               <Link to="/profile" className="nav-link">Profile</Link>
               <ThemeToggle />
               <Link to="/login" className="btn btn-primary nav-btn">Login</Link>
@@ -80,6 +85,19 @@ function App() {
           
           {/* Analytics & Reports */}
           <Route path="/analytics" element={<Analytics />} />
+          
+          {/* AI Features */}
+          <Route path="/ai/matching" element={<AIMatching />} />
+          <Route path="/ai/proposal-assistant" element={<ProposalAssistant />} />
+          
+          {/* Freelancer Setup */}
+          <Route path="/freelancer/setup" element={<FreelancerProfileSetup />} />
+          
+          {/* Escrow & Payments */}
+          <Route path="/escrow" element={<EscrowManagement />} />
+          
+          {/* Time Tracking */}
+          <Route path="/time-tracking" element={<TimeTracking />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
