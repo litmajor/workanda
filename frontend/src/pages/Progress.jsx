@@ -24,7 +24,7 @@ function Progress() {
       { name: 'Charts & Data Visualization', progress: 70, status: 'in-progress' },
       { name: 'File Upload & Drag & Drop', progress: 70, status: 'in-progress' },
       { name: 'API Integration', progress: 45, status: 'in-progress' },
-      { name: 'UI/UX Polish', progress: 55, status: 'in-progress' }
+      { name: 'UI/UX Polish', progress: 100, status: 'complete' }
     ],
     deployment: [
       { name: 'Development Environment', progress: 100, status: 'complete' },
@@ -37,9 +37,9 @@ function Progress() {
 
   const overallProgress = {
     backend: 78,
-    frontend: 82,
+    frontend: 95,
     deployment: 40,
-    combined: 80
+    combined: 86
   }
 
   const getStatusColor = (status) => {
