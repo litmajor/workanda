@@ -18,6 +18,8 @@ pub mod workflows;
 pub mod kyc;
 pub mod fiat_gateway;
 pub mod swap;
+pub mod wallet_escrow;
+pub mod financial_management;
 pub use ai_matching::{
     DynamicTeamSuggestion, TeamMemberProfile, CommunicationStyle,
     CollaborationHistory, TeamDynamics, SkillSynergyAnalysis,

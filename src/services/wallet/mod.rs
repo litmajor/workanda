@@ -7,6 +7,7 @@ pub mod receipt_service;
 pub mod exchange_rate_service;
 pub mod fiat_gateway_service;
 pub mod swap_service;
+pub mod escrow_service;
 
 pub use wallet_service::*;
 pub use transaction_service::*;
@@ -17,3 +18,4 @@ pub use receipt_service::*;
 pub use exchange_rate_service::*;
 pub use fiat_gateway_service::*;
 pub use swap_service::*;
+pub use escrow_service::*;

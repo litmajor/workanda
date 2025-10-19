@@ -375,6 +375,8 @@
 - ✅ Swap service with slippage protection
 - ✅ Auto-conversion on receipt
 - ✅ Swap analytics dashboard
+- ✅ Escrow integration (automatic deposits, milestone releases, multi-currency)
+- ✅ Financial management (income/expense tracking, budgets, savings goals, invoices)
 
 ---
 
