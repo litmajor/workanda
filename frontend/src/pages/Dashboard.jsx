@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './Dashboard.css'
+import { EarningsChart } from '../components/Chart'
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -8,8 +9,31 @@ function Dashboard() {
     activeProjects: 3,
     completedProjects: 12,
     totalEarnings: '$15,420',
-    pendingPayments: '$2,500'
+    pendingPayments: '$2,500',
+    responseRate: '95%',
+    avgResponseTime: '2 hours'
   }
+
+  const earningsData = [
+    { month: 'Jan', earnings: 2100 },
+    { month: 'Feb', earnings: 2400 },
+    { month: 'Mar', earnings: 1800 },
+    { month: 'Apr', earnings: 3200 },
+    { month: 'May', earnings: 2800 },
+    { month: 'Jun', earnings: 3100 }
+  ]
+
+  const recentActivity = [
+    { id: 1, type: 'payment', message: 'Payment received for E-commerce Website', time: '2 hours ago', icon: '💰' },
+    { id: 2, type: 'milestone', message: 'Milestone approved by TechCorp Inc.', time: '5 hours ago', icon: '✅' },
+    { id: 3, type: 'message', message: 'New message from StartupX', time: '1 day ago', icon: '💬' },
+    { id: 4, type: 'review', message: 'You received a 5-star review', time: '2 days ago', icon: '⭐' }
+  ]
+
+  const upcomingDeadlines = [
+    { project: 'Mobile App UI Design', deadline: 'Nov 30, 2025', daysLeft: 5 },
+    { project: 'E-commerce Website', deadline: 'Dec 15, 2025', daysLeft: 20 }
+  ]
 
   const activeProjects = [
     {
@@ -67,20 +91,56 @@ function Dashboard() {
 
       <div className="stats-grid">
         <div className="stat-card">
+          <div className="stat-icon">📊</div>
           <div className="stat-value">{stats.activeProjects}</div>
           <div className="stat-label">Active Projects</div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon">✅</div>
           <div className="stat-value">{stats.completedProjects}</div>
           <div className="stat-label">Completed</div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon">💰</div>
           <div className="stat-value">{stats.totalEarnings}</div>
           <div className="stat-label">Total Earnings</div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon">⏳</div>
           <div className="stat-value">{stats.pendingPayments}</div>
           <div className="stat-label">Pending Payments</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">📈</div>
+          <div className="stat-value">{stats.responseRate}</div>
+          <div className="stat-label">Response Rate</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon">⚡</div>
+          <div className="stat-value">{stats.avgResponseTime}</div>
+          <div className="stat-label">Avg Response</div>
+        </div>
+      </div>
+
+      <div className="quick-actions">
+        <h3>Quick Actions</h3>
+        <div className="action-buttons">
+          <button className="action-btn">
+            <span className="action-icon">➕</span>
+            <span>Submit Proposal</span>
+          </button>
+          <button className="action-btn">
+            <span className="action-icon">💬</span>
+            <span>Message Client</span>
+          </button>
+          <button className="action-btn">
+            <span className="action-icon">📄</span>
+            <span>Create Invoice</span>
+          </button>
+          <button className="action-btn">
+            <span className="action-icon">⏰</span>
+            <span>Log Time</span>
+          </button>
         </div>
       </div>
 
@@ -100,37 +160,78 @@ function Dashboard() {
       </div>
 
       {activeTab === 'overview' && (
-        <div className="projects-section">
-          <h2>Active Projects</h2>
-          <div className="projects-list">
-            {activeProjects.map(project => (
-              <div key={project.id} className="project-card">
-                <div className="project-header">
-                  <div>
-                    <h3>{project.title}</h3>
-                    <p className="project-client">{project.client}</p>
+        <>
+          <div className="dashboard-grid">
+            <div className="projects-section">
+              <h2>Active Projects</h2>
+              <div className="projects-list">
+                {activeProjects.map(project => (
+                  <div key={project.id} className="project-card">
+                    <div className="project-header">
+                      <div>
+                        <h3>{project.title}</h3>
+                        <p className="project-client">{project.client}</p>
+                      </div>
+                      <span className={`status-badge ${project.status.toLowerCase().replace(' ', '-')}`}>
+                        {project.status}
+                      </span>
+                    </div>
+                    <div className="project-progress">
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${project.progress}%` }}
+                        />
+                      </div>
+                      <span className="progress-text">{project.progress}% complete</span>
+                    </div>
+                    <div className="project-footer">
+                      <span>Deadline: {project.deadline}</span>
+                      <span className="project-amount">{project.amount}</span>
+                    </div>
                   </div>
-                  <span className={`status-badge ${project.status.toLowerCase().replace(' ', '-')}`}>
-                    {project.status}
-                  </span>
-                </div>
-                <div className="project-progress">
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill" 
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                  <span className="progress-text">{project.progress}% complete</span>
-                </div>
-                <div className="project-footer">
-                  <span>Deadline: {project.deadline}</span>
-                  <span className="project-amount">{project.amount}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="sidebar-section">
+              <div className="activity-feed">
+                <h3>Recent Activity</h3>
+                <div className="activity-list">
+                  {recentActivity.map(activity => (
+                    <div key={activity.id} className="activity-item">
+                      <span className="activity-icon">{activity.icon}</span>
+                      <div className="activity-content">
+                        <p>{activity.message}</p>
+                        <span className="activity-time">{activity.time}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+
+              <div className="deadlines-section">
+                <h3>Upcoming Deadlines</h3>
+                <div className="deadlines-list">
+                  {upcomingDeadlines.map((item, index) => (
+                    <div key={index} className="deadline-item">
+                      <h4>{item.project}</h4>
+                      <p>{item.deadline}</p>
+                      <span className={`days-left ${item.daysLeft <= 7 ? 'urgent' : ''}`}>
+                        {item.daysLeft} days left
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          <div className="earnings-chart-section">
+            <h2>Earnings Overview</h2>
+            <EarningsChart data={earningsData} />
+          </div>
+        </>
       )}
 
       {activeTab === 'proposals' && (

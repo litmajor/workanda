@@ -48,26 +48,53 @@ function App() {
         </nav>
 
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          
+          {/* Job Routes */}
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
           <Route path="/post-job" element={<PostJob />} />
+          
+          {/* User Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/proposals" element={<Proposals />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/:id" element={<Projects />} />
-          <Route path="/reviews" element={<Reviews />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/progress" element={<Progress />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/notifications" element={<Notifications />} />
+          
+          {/* Project & Proposal Routes */}
+          <Route path="/proposals" element={<Proposals />} />
+          <Route path="/proposals/:id" element={<Proposals />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id" element={<Projects />} />
+          
+          {/* Communication Routes */}
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:userId" element={<Messages />} />
+          
+          {/* Team & Collaboration Routes */}
           <Route path="/teams" element={<Teams />} />
+          <Route path="/teams/:id" element={<Teams />} />
+          
+          {/* Review & Rating Routes */}
+          <Route path="/reviews" element={<Reviews />} />
+          <Route path="/reviews/:userId" element={<Reviews />} />
+          
+          {/* Analytics & Reports */}
           <Route path="/analytics" element={<Analytics />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminDashboard />} />
+          <Route path="/admin/jobs" element={<AdminDashboard />} />
+          <Route path="/admin/disputes" element={<AdminDashboard />} />
+          <Route path="/admin/analytics" element={<AdminDashboard />} />
+          
+          {/* Development/Progress Route */}
+          <Route path="/progress" element={<Progress />} />
         </Routes>
 
         <footer className="footer">

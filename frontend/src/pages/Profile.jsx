@@ -43,6 +43,24 @@ function Profile() {
     }
   ])
 
+  const [certifications] = useState([
+    { name: 'AWS Certified Solutions Architect', issuer: 'Amazon', year: 2023 },
+    { name: 'React Developer Certification', issuer: 'Meta', year: 2022 }
+  ])
+
+  const [earnings] = useState({
+    total: '$45,680',
+    thisMonth: '$3,200',
+    lastMonth: '$4,100',
+    avgPerProject: '$1,800'
+  })
+
+  const [availability] = useState({
+    hoursPerWeek: 30,
+    nextAvailable: 'Immediately',
+    timezone: 'PST (UTC-8)'
+  })
+
   return (
     <div className="profile-page">
       <div className="profile-container">
@@ -93,6 +111,33 @@ function Profile() {
               ))}
             </ul>
           </div>
+
+          <div className="profile-card">
+            <h3>Availability</h3>
+            <div className="availability-info">
+              <p><strong>Hours/Week:</strong> {availability.hoursPerWeek}</p>
+              <p><strong>Available:</strong> {availability.nextAvailable}</p>
+              <p><strong>Timezone:</strong> {availability.timezone}</p>
+            </div>
+          </div>
+
+          <div className="profile-card">
+            <h3>Earnings Summary</h3>
+            <div className="earnings-summary">
+              <div className="earning-item">
+                <span className="earning-label">Total Earned</span>
+                <span className="earning-value">{earnings.total}</span>
+              </div>
+              <div className="earning-item">
+                <span className="earning-label">This Month</span>
+                <span className="earning-value">{earnings.thisMonth}</span>
+              </div>
+              <div className="earning-item">
+                <span className="earning-label">Avg Per Project</span>
+                <span className="earning-value">{earnings.avgPerProject}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="profile-main">
@@ -113,6 +158,21 @@ function Profile() {
                     {item.tags.map((tag, index) => (
                       <span key={index} className="tag">{tag}</span>
                     ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="profile-section">
+            <h3>Certifications & Education</h3>
+            <div className="certifications-list">
+              {certifications.map((cert, index) => (
+                <div key={index} className="certification-item">
+                  <div className="cert-icon">🎓</div>
+                  <div className="cert-details">
+                    <h4>{cert.name}</h4>
+                    <p>{cert.issuer} • {cert.year}</p>
                   </div>
                 </div>
               ))}
