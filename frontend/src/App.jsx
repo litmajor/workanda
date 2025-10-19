@@ -12,6 +12,7 @@ import Proposals from './pages/Proposals'
 import Projects from './pages/Projects'
 import Reviews from './pages/Reviews'
 import AdminDashboard from './pages/AdminDashboard'
+import Progress from './pages/Progress'
 import ThemeToggle from './components/ThemeToggle'
 import './App.css'
 
@@ -31,6 +32,7 @@ function App() {
               <Link to="/dashboard" className="nav-link">Dashboard</Link>
               <Link to="/messages" className="nav-link">Messages</Link>
               <Link to="/profile" className="nav-link">Profile</Link>
+              <Link to="/progress" className="nav-link">Progress</Link>
               <ThemeToggle />
               <Link to="/login" className="btn btn-primary nav-btn">Login</Link>
             </div>
@@ -53,6 +55,7 @@ function App() {
           <Route path="/projects/:id" element={<Projects />} />
           <Route path="/reviews" element={<Reviews />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/progress" element={<Progress />} />
         </Routes>
 
         <footer className="footer">

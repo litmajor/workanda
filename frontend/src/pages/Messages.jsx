@@ -18,7 +18,7 @@ function Messages() {
     {
       id: 2,
       name: 'Mike Rodriguez',
-      lastMessage: 'I've sent the files for review',
+      lastMessage: 'I have sent the files for review',
       time: '1 hour ago',
       unread: 0,
       avatar: 'M',
