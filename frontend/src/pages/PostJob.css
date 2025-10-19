@@ -1,5 +1,5 @@
 .post-job-page {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 3rem 2rem;
   min-height: calc(100vh - 200px);
@@ -8,12 +8,17 @@
 .form-header {
   text-align: center;
   margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(67, 56, 202, 0.05) 100%);
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
 }
 
 .form-header h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   color: var(--text-primary);
+  font-weight: 700;
 }
 
 .form-header p {
@@ -22,10 +27,11 @@
 }
 
 .job-form {
-  background: white;
+  background: var(--bg-primary);
   padding: 2.5rem;
   border-radius: 1rem;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
 }
 
 .form-group {
@@ -43,12 +49,14 @@
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.875rem 1.25rem;
   border: 2px solid var(--border-color);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-size: 1rem;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: all 0.3s;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .form-group input:focus,
@@ -56,6 +64,14 @@
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  transform: translateY(-2px);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
 }
 
 .form-group textarea {
@@ -72,7 +88,63 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.form-actions .btn {
+  padding: 1rem 2rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.3s;
+}
+
+.form-actions .btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.form-actions .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.form-actions .btn-secondary {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.form-actions .btn-secondary:hover {
+  background: var(--bg-primary);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 150px;
 }
 
 @media (max-width: 768px) {
@@ -85,6 +157,10 @@
   }
   
   .job-form {
+    padding: 1.5rem;
+  }
+  
+  .form-header {
     padding: 1.5rem;
   }
 }

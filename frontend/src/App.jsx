@@ -32,14 +32,11 @@ function App() {
             </Link>
             <div className="nav-links">
               <Link to="/jobs" className="nav-link">Browse Jobs</Link>
-              <Link to="/post-job" className="nav-link">Post a Job</Link>
+              <Link to="/post-job" className="nav-link">Post Job</Link>
               <Link to="/dashboard" className="nav-link">Dashboard</Link>
+              <Link to="/analytics" className="nav-link">Analytics</Link>
               <Link to="/messages" className="nav-link">Messages</Link>
               <Link to="/profile" className="nav-link">Profile</Link>
-              <Link to="/teams" className="nav-link">Teams</Link>
-              <Link to="/analytics" className="nav-link">Analytics</Link>
-              <Link to="/notifications" className="nav-link">Notifications</Link>
-              <Link to="/settings" className="nav-link">Settings</Link>
               <Link to="/progress" className="nav-link">Progress</Link>
               <ThemeToggle />
               <Link to="/login" className="btn btn-primary nav-btn">Login</Link>
