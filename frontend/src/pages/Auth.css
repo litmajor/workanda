@@ -16,6 +16,7 @@
   padding: 3rem;
   border-radius: 1rem;
   box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
 }
 
 .auth-header {

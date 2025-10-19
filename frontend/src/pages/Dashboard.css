@@ -28,11 +28,12 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-primary);
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: var(--shadow);
   text-align: center;
+  border: 1px solid var(--border-color);
 }
 
 .stat-value {
@@ -90,11 +91,12 @@
 }
 
 .project-card {
-  background: white;
+  background: var(--bg-primary);
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--border-color);
 }
 
 .project-card:hover {
@@ -186,10 +188,11 @@
 }
 
 .proposals-table {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 1rem;
   box-shadow: var(--shadow);
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
 .proposals-table table {
