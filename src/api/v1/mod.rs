@@ -16,6 +16,7 @@ pub mod admin;
 pub mod review;
 pub mod team;
 pub mod agency;
+pub mod ai;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(auth::routes::config);
@@ -32,6 +33,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(review::routes::config);
     team::routes::config(cfg);
     agency::routes::config(cfg);
+    ai::routes::config(cfg);
 }
 
 pub use self::auth::*;

@@ -9,6 +9,7 @@ pub mod review;
 pub mod message;
 pub mod team_proposal;
 pub mod revenue_distribution;
+pub mod ai_matching;
 
 pub use self::user::*;
 pub use self::job::*;
@@ -21,3 +22,4 @@ pub use self::review::*;
 pub use self::message::*;
 pub use self::team_proposal::*;
 pub use self::revenue_distribution::*;
+pub use self::ai_matching::*;
