@@ -1,7 +1,17 @@
 .app {
   min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.alerts-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+  max-width: 400px;
 }
 
 .navbar {
