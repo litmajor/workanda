@@ -53,9 +53,9 @@ function Messages() {
       { id: 5, sender: 'them', text: 'Sounds great! When can you start?', time: '10:40 AM' }
     ],
     2: [
-      { id: 1, sender: 'them', text: 'Hey, how's the project going?', time: 'Yesterday' },
-      { id: 2, sender: 'me', text: 'Going well! I've completed the authentication module.', time: 'Yesterday' },
-      { id: 3, sender: 'them', text: 'I've sent the files for review', time: 'Today 9:00 AM' }
+      { id: 1, sender: 'them', text: "Hey, how's the project going?", time: 'Yesterday' },
+      { id: 2, sender: 'me', text: "Going well! I've completed the authentication module.", time: 'Yesterday' },
+      { id: 3, sender: 'them', text: "I've sent the files for review", time: 'Today 9:00 AM' }
     ]
   }
 
