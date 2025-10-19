@@ -5,15 +5,16 @@
 }
 
 .navbar {
-  background: white;
+  background: var(--bg-primary);
   box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background-color 0.3s;
 }
 
 .nav-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 1rem 2rem;
   display: flex;
@@ -36,7 +37,8 @@
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .nav-link {
@@ -50,18 +52,26 @@
   color: var(--primary-color);
 }
 
-.footer {
-  margin-top: auto;
-  background: var(--text-primary);
-  color: white;
-  text-align: center;
-  padding: 2rem;
+.nav-btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
 }
 
-@media (max-width: 768px) {
+.footer {
+  margin-top: auto;
+  background: var(--bg-primary);
+  border-top: 2px solid var(--border-color);
+  color: var(--text-primary);
+  text-align: center;
+  padding: 2rem;
+  transition: background-color 0.3s;
+}
+
+@media (max-width: 968px) {
   .nav-links {
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 1rem;
+    justify-content: center;
   }
   
   .nav-container {
