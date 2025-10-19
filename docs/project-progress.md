@@ -24,6 +24,23 @@
 
 ---
 
+## 💬 Communication Progress: 70%
+```
+███████████████████████████████████░░░░░░░░░░░░░░░ 70%
+```
+
+| Feature | Status | Progress | Notes |
+|---------|--------|----------|-------|
+| Messaging System | ✅ Complete | 100% | Real-time chat |
+| Notifications | ✅ Complete | 100% | In-app & email |
+| Telegram Bot | ⚠️ In Progress | 60% | Basic notifications |
+| Email Templates | ⚠️ In Progress | 50% | Transactional emails |
+| WebSocket Support | ⚠️ In Progress | 70% | Real-time updates |
+| File Sharing | ⚠️ In Progress | 60% | Upload/download |
+| Video Calls | ❌ Planned | 0% | Future feature |
+
+---
+
 ## 🎯 Backend Implementation Status
 
 ### 1. Core Infrastructure (95% Complete)

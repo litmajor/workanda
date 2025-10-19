@@ -16,6 +16,15 @@ function Progress() {
       { name: 'Admin & Moderation', progress: 80, status: 'in-progress' },
       { name: 'Reviews & Ratings', progress: 90, status: 'complete' }
     ],
+    communication: [
+      { name: 'Messaging System', progress: 100, status: 'complete' },
+      { name: 'Notifications', progress: 100, status: 'complete' },
+      { name: 'Telegram Bot', progress: 60, status: 'in-progress' },
+      { name: 'Email Templates', progress: 50, status: 'in-progress' },
+      { name: 'WebSocket Support', progress: 70, status: 'in-progress' },
+      { name: 'File Sharing', progress: 60, status: 'in-progress' },
+      { name: 'Video Calls', progress: 0, status: 'planned' }
+    ],
     frontend: [
       { name: 'Core Setup', progress: 100, status: 'complete' },
       { name: 'Pages Implementation', progress: 100, status: 'complete' },
@@ -179,6 +188,12 @@ function Progress() {
             Frontend
           </button>
           <button 
+            className={`tab ${activeSection === 'communication' ? 'active' : ''}`}
+            onClick={() => setActiveSection('communication')}
+          >
+            Communication
+          </button>
+          <button 
             className={`tab ${activeSection === 'deployment' ? 'active' : ''}`}
             onClick={() => setActiveSection('deployment')}
           >
@@ -223,6 +238,7 @@ function Progress() {
                 <div className="highlight">✅ Mobile Responsiveness - Fully optimized</div>
               </div>
             </div>
+          </div>
         )}
 
         {activeSection !== 'overview' && (
