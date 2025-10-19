@@ -19,7 +19,9 @@ import Proposals from './pages/Proposals'
 import Projects from './pages/Projects'
 import Reviews from './pages/Reviews'
 import AdminDashboard from './pages/AdminDashboard'
-import Progress from './pages/Progress'
+import Progress from './pages/Progress';
+import Wallet from './pages/Wallet';
+import { AppProvider } from './context/AppContext';
 import Settings from './pages/Settings'
 import Notifications from './pages/Notifications'
 import Teams from './pages/Teams'
@@ -51,6 +53,7 @@ function App() {
                 <Link to="/ai/matching" className="nav-link">AI Matching</Link>
                 <Link to="/dashboard" className="nav-link">Dashboard</Link>
                 <Link to="/escrow" className="nav-link">Payments</Link>
+                <Link to="/wallet" className="nav-link">Wallet</Link>
                 <Link to="/trust-safety" className="nav-link">Trust & Safety</Link>
                 <Link to="/profile" className="nav-link">Profile</Link>
                 <ThemeToggle />
@@ -117,6 +120,7 @@ function App() {
             <Route path="/invoicing" element={<Invoicing />} />
             <Route path="/ai-matching" element={<AIMatching />} />
             <Route path="/proposal-assistant" element={<ProposalAssistant />} />
+            <Route path="/wallet" element={<Wallet />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />

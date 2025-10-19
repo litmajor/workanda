@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod user;
+pub mod wallet;
 pub mod health;
 pub mod user;
 pub mod project;

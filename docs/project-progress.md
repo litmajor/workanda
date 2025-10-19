@@ -100,14 +100,15 @@
 ```
 
 | Feature | Status | Progress | Notes |
-|---------|--------|----------|-------|
+|-----------|--------|----------|-------|
 | Escrow System | ✅ Complete | 100% | Fund holding & release |
 | Payment Processing | ✅ Complete | 100% | Stripe integration complete |
 | Milestone Payments | ✅ Complete | 100% | Automated on approval |
 | Multi-Currency | ✅ Complete | 100% | Fiat & crypto support |
 | Payment History | ✅ Complete | 100% | Full transaction logs |
 | Invoicing | ✅ Complete | 100% | Generation working |
-| Refunds | ✅ Complete | 100% | Full implementation |
+| Refunds | ✅ Complete | 100% | Basic implementation |
+| Wallet System | ✅ Complete | 100% | Multi-currency support, transactions |
 | Dispute Resolution | ✅ Complete | 100% | Escalation system |
 | Transaction Fees | ✅ Complete | 100% | Configurable rates |
 

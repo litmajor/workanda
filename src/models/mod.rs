@@ -13,6 +13,8 @@ pub mod ai_matching;
 pub mod predictive_analytics;
 pub mod proposal_assistant;
 pub mod trust_safety;
+pub mod wallet;
+pub mod workflows;
 pub use ai_matching::{
     DynamicTeamSuggestion, TeamMemberProfile, CommunicationStyle,
     CollaborationHistory, TeamDynamics, SkillSynergyAnalysis,
@@ -48,3 +50,4 @@ pub use self::message::*;
 pub use self::team_proposal::*;
 pub use self::revenue_distribution::*;
 pub use self::ai_matching::*;
+pub use self::wallet::*;
