@@ -358,3 +358,15 @@ export class WebSocketService {
 }
 
 export const wsService = new WebSocketService()
+
+export default {
+  auth: authAPI,
+  jobs: jobsAPI,
+  projects: projectsAPI,
+  messages: messagesAPI,
+  payments: paymentsAPI,
+  ai: aiAPI,
+  proposals: proposalsAPI,
+  teams: teamsAPI,
+  ws: wsService,
+}

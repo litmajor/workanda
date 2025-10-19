@@ -75,3 +75,9 @@ export function PerformanceChart({ data }) {
     </ResponsiveContainer>
   )
 }
+
+export default {
+  EarningsChart,
+  ProjectDistributionChart,
+  PerformanceChart,
+}
