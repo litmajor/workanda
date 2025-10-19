@@ -28,8 +28,8 @@ import TrustSafety from './pages/TrustSafety'
 import AIMatching from './pages/AIMatching'
 import ProposalAssistant from './pages/ProposalAssistant'
 import FreelancerProfileSetup from './pages/FreelancerProfileSetup'
-import EscrowManagement from './pages/EscrowManagement'
-import TimeTracking from './pages/TimeTracking'
+import EscrowManagement from './pages/EscrowManagement';
+import Invoicing from './pages/Invoicing';
 import './App.css'
 
 function App() {
@@ -114,16 +114,16 @@ function App() {
 
             {/* Escrow & Payments */}
             <Route path="/escrow" element={<EscrowManagement />} />
-
-            {/* Time Tracking */}
-            <Route path="/time-tracking" element={<TimeTracking />} />
+            <Route path="/invoicing" element={<Invoicing />} />
+            <Route path="/ai-matching" element={<AIMatching />} />
+            <Route path="/proposal-assistant" element={<ProposalAssistant />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminDashboard />} />
             <Route path="/admin/jobs" element={<AdminDashboard />} />
             <Route path="/admin/disputes" element={<AdminDashboard />} />
-            <<Route path="/admin/analytics" element={<AdminDashboard />} />
+            <Route path="/admin/analytics" element={<AdminDashboard />} />
 
             {/* Development/Progress Route */}
             <Route path="/progress" element={<Progress />} />

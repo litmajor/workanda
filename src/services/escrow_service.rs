@@ -337,14 +337,16 @@ pub async fn process_refund(
     pool: &PgPool,
     contract_id: Uuid,
     amount: Decimal,
-) -> Result<(), String> {
+    reason: String,
+    refund_type: RefundType,
+) -> Result<RefundResult, String> {
     let mut transaction = pool.begin().await.map_err(|e| e.to_string())?;
 
     // Fetch contract details to get client ID
     let contract = sqlx::query_as!(
         Contract,
         r#"
-        SELECT client_id
+        SELECT client_id, freelancer_id, total_amount
         FROM contracts
         WHERE id = $1
         "#,
@@ -355,8 +357,7 @@ pub async fn process_refund(
     .map_err(|e| e.to_string())?;
 
     // Fetch escrow account details
-    let mut escrow_account = sqlx::query_as!(
-        EscrowAccount,
+    let escrow_account = sqlx::query!(
         r#"
         SELECT id, contract_id, amount, status, dispute
         FROM escrow_accounts
@@ -368,31 +369,53 @@ pub async fn process_refund(
     .await
     .map_err(|e| e.to_string())?;
 
-    // Check if refund is allowed (e.g., contract canceled or dispute resolved)
+    // Comprehensive validation
     if escrow_account.dispute {
-        return Err("Cannot refund while a dispute is active.".to_string());
+        return Err("Cannot refund while a dispute is active. Please resolve the dispute first.".to_string());
     }
+    
     if escrow_account.status != "LOCKED" && escrow_account.status != "RESOLVED" {
-        return Err("Escrow is not in a refundable state.".to_string());
+        return Err(format!("Escrow is not in a refundable state. Current status: {}", escrow_account.status));
+    }
+
+    // Validate refund amount
+    if amount <= Decimal::ZERO {
+        return Err("Refund amount must be greater than zero.".to_string());
     }
 
     // Validate sufficient funds
     if escrow_account.amount < amount {
-        return Err("Insufficient funds to process refund.".to_string());
+        return Err(format!(
+            "Insufficient funds to process refund. Available: {}, Requested: {}",
+            escrow_account.amount, amount
+        ));
     }
+
+    // Calculate refund fee if applicable
+    let refund_fee = match refund_type {
+        RefundType::Full => Decimal::ZERO,
+        RefundType::Partial => amount * Decimal::from_str("0.025").unwrap(), // 2.5% fee for partial refunds
+        RefundType::Disputed => Decimal::ZERO, // No fee for dispute-resolved refunds
+    };
+
+    let net_refund_amount = amount - refund_fee;
 
     // Validate client account exists
     validate_account_exists(&mut *transaction, contract.client_id).await?;
 
-    // Deduct from escrow and transfer to client
-    escrow_account.amount -= amount;
+    // Deduct from escrow
+    let new_escrow_amount = escrow_account.amount - amount;
     sqlx::query!(
         r#"
         UPDATE escrow_accounts
-        SET amount = $1
+        SET amount = $1,
+            status = CASE 
+                WHEN $1 = 0 THEN 'REFUNDED'
+                ELSE status
+            END
         WHERE contract_id = $2
         "#,
-        escrow_account.amount,
+        new_escrow_amount,
         contract_id
     )
     .execute(&mut *transaction)
@@ -400,18 +423,131 @@ pub async fn process_refund(
     .map_err(|e| e.to_string())?;
 
     // Transfer refunded amount to client's account
-    update_balance(&mut *transaction, contract.client_id, amount).await?;
+    update_balance(&mut *transaction, contract.client_id, net_refund_amount).await?;
+
+    // Transfer fee to platform if applicable
+    if refund_fee > Decimal::ZERO {
+        const PLATFORM_ACCOUNT_ID: i32 = 1;
+        update_balance(&mut *transaction, PLATFORM_ACCOUNT_ID, refund_fee).await?;
+    }
+
+    // Create refund record
+    let refund_id = sqlx::query_scalar!(
+        r#"
+        INSERT INTO refunds (
+            escrow_account_id,
+            contract_id,
+            amount,
+            fee,
+            net_amount,
+            reason,
+            refund_type,
+            status,
+            processed_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'completed', NOW())
+        RETURNING id
+        "#,
+        escrow_account.id,
+        contract_id,
+        amount,
+        refund_fee,
+        net_refund_amount,
+        reason,
+        refund_type.to_string()
+    )
+    .fetch_one(&mut *transaction)
+    .await
+    .map_err(|e| e.to_string())?;
 
     // Record refund in payment history
     record_payment_history(
         &mut *transaction,
         escrow_account.id,
         amount,
-        "Refund",
+        &format!("Refund - {}", refund_type.to_string()),
         contract.client_id,
     ).await?;
 
-    transaction.commit().await.map_err(|e| e.to_string())
+    // Send notifications
+    send_refund_notification(
+        &mut *transaction,
+        contract.client_id,
+        contract.freelancer_id,
+        net_refund_amount,
+        &reason
+    ).await?;
+
+    transaction.commit().await.map_err(|e| e.to_string())?;
+
+    Ok(RefundResult {
+        refund_id,
+        amount,
+        fee: refund_fee,
+        net_amount: net_refund_amount,
+        status: "completed".to_string(),
+    })
+}
+
+#[derive(Debug)]
+pub enum RefundType {
+    Full,
+    Partial,
+    Disputed,
+}
+
+impl ToString for RefundType {
+    fn to_string(&self) -> String {
+        match self {
+            RefundType::Full => "full".to_string(),
+            RefundType::Partial => "partial".to_string(),
+            RefundType::Disputed => "disputed".to_string(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct RefundResult {
+    pub refund_id: i32,
+    pub amount: Decimal,
+    pub fee: Decimal,
+    pub net_amount: Decimal,
+    pub status: String,
+}
+
+async fn send_refund_notification(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    client_id: i32,
+    freelancer_id: i32,
+    amount: Decimal,
+    reason: &str,
+) -> Result<(), String> {
+    // Send notification to client
+    sqlx::query!(
+        r#"
+        INSERT INTO notifications (user_id, type, title, message, created_at)
+        VALUES ($1, 'refund', 'Refund Processed', $2, NOW())
+        "#,
+        client_id,
+        format!("Your refund of ${} has been processed. Reason: {}", amount, reason)
+    )
+    .execute(&mut **transaction)
+    .await
+    .map_err(|e| e.to_string())?;
+
+    // Send notification to freelancer
+    sqlx::query!(
+        r#"
+        INSERT INTO notifications (user_id, type, title, message, created_at)
+        VALUES ($1, 'refund', 'Refund Issued', $2, NOW())
+        "#,
+        freelancer_id,
+        format!("A refund of ${} has been issued for the contract.", amount)
+    )
+    .execute(&mut **transaction)
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
 }
 
 pub async fn get_escrow_account_details(
