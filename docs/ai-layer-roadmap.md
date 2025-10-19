@@ -249,11 +249,13 @@ POST /api/v1/ai/search
 }
 ```
 
-## Phase 4: Trust & Safety (Months 10-12)
+## Phase 4: Trust & Safety (Months 10-12) ✅ IMPLEMENTED
 
-### 4.1 AI-Powered Trust Scores
+### 4.1 AI-Powered Trust Scores ✅ COMPLETED
 
 **Goal**: Multi-dimensional trust scoring beyond reviews.
+
+**Status**: ✅ Implemented in `src/services/trust_safety_service.rs`
 
 **Factors**:
 ```rust
@@ -279,9 +281,11 @@ pub struct TrustComponents {
 - Timeline accuracy
 - Client satisfaction trends
 
-### 4.2 Fraud Detection
+### 4.2 Fraud Detection ✅ COMPLETED
 
 **Goal**: Identify and prevent fraudulent activity.
+
+**Status**: ✅ Implemented in `src/services/trust_safety_service.rs`
 
 **Features**:
 - Unusual behavior detection
@@ -290,9 +294,20 @@ pub struct TrustComponents {
 - Review manipulation detection
 - Bot account detection
 
-### 4.3 Dispute Prediction & Prevention
+### 4.3 Dispute Prediction & Prevention ✅ COMPLETED
 
 **Goal**: Identify potential disputes before they escalate.
+
+**Status**: ✅ Implemented in `src/services/trust_safety_service.rs`
+
+**API Endpoints**:
+```http
+GET /api/v1/trust/score/{user_id}              # Get trust score for user
+GET /api/v1/trust/fraud/check/{user_id}        # Check for fraudulent activity
+GET /api/v1/trust/fraud/alerts                 # Get fraud alerts (admin)
+GET /api/v1/trust/dispute/risk/{contract_id}   # Predict dispute risk
+GET /api/v1/trust/behavioral/{user_id}         # Get behavioral analysis
+```
 
 **Warning Signs**:
 - Communication breakdown

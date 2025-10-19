@@ -12,6 +12,7 @@ pub mod revenue_distribution;
 pub mod ai_matching;
 pub mod predictive_analytics;
 pub mod proposal_assistant;
+pub mod trust_safety;
 pub use ai_matching::{
     DynamicTeamSuggestion, TeamMemberProfile, CommunicationStyle,
     CollaborationHistory, TeamDynamics, SkillSynergyAnalysis,
@@ -27,6 +28,12 @@ pub use proposal_assistant::{
     ProjectType, ComplexityLevel, SmartSearchRequest, SearchType,
     SearchFilters, SmartSearchResponse, SearchResult, IntentAnalysis,
     TrendingSkill,
+};
+pub use trust_safety::{
+    TrustScore, TrustComponents, TrustTrend, UserTrustScore,
+    FraudDetectionResult, FraudFlag, FraudFlagType, FraudRiskLevel,
+    FraudAlert, DisputeRiskAlert, DisputeWarningType, DisputeRiskAssessment,
+    BehavioralAnalysis, TrustScoreRequest, FraudCheckRequest, DisputeRiskRequest,
 };
 
 pub use self::user::*;

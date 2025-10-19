@@ -18,6 +18,7 @@ pub mod team;
 pub mod agency;
 pub mod ai;
 pub mod predictive;
+pub mod trust;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(auth::routes::config);
