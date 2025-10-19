@@ -46,9 +46,9 @@ function Messages() {
 
   const messages = {
     1: [
-      { id: 1, sender: 'them', text: 'Hi! I saw your proposal and I'm impressed with your portfolio.', time: '10:30 AM' },
-      { id: 2, sender: 'me', text: 'Thank you! I'm excited about this project. I have experience with similar e-commerce platforms.', time: '10:32 AM' },
-      { id: 3, sender: 'them', text: 'That's perfect! What's your availability like?', time: '10:35 AM' },
+      { id: 1, sender: 'them', text: 'Hi! I saw your proposal and I am impressed with your portfolio.', time: '10:30 AM' },
+      { id: 2, sender: 'me', text: 'Thank you! I am excited about this project. I have experience with similar e-commerce platforms.', time: '10:32 AM' },
+      { id: 3, sender: 'them', text: 'That is perfect! What is your availability like?', time: '10:35 AM' },
       { id: 4, sender: 'me', text: 'I can start next week. I estimate 8-10 weeks for completion based on the requirements.', time: '10:37 AM' },
       { id: 5, sender: 'them', text: 'Sounds great! When can you start?', time: '10:40 AM' }
     ],
