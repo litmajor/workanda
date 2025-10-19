@@ -5,6 +5,8 @@ import PostJob from './pages/PostJob'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import JobDetails from './pages/JobDetails'
 import Messages from './pages/Messages'
@@ -54,6 +56,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Job Routes */}
           <Route path="/jobs" element={<Jobs />} />

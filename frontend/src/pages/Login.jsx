@@ -91,8 +91,25 @@ function Login() {
             <span>OR</span>
           </div>
 
-          <button className="btn btn-secondary btn-block">
+          <button 
+            className="btn btn-secondary btn-block"
+            onClick={() => {
+              // TODO: Implement Google OAuth
+              window.location.href = '/api/v1/auth/google'
+            }}
+          >
             <span>🔐</span> Continue with Google
+          </button>
+
+          <button 
+            className="btn btn-secondary btn-block"
+            onClick={() => {
+              // TODO: Implement Telegram OAuth
+              window.location.href = '/api/v1/auth/telegram'
+            }}
+            style={{ marginTop: '0.5rem' }}
+          >
+            <span>✈️</span> Continue with Telegram
           </button>
 
           <p className="auth-switch">

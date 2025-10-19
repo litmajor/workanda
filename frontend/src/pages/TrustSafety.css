@@ -45,18 +45,22 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
 }
 
 .score-value {
   font-size: 2.5rem;
   font-weight: 700;
-  color: white;
+  color: #ffffff;
+  line-height: 1;
 }
 
 .score-label {
   font-size: 0.75rem;
-  color: white;
-  opacity: 0.9;
+  color: #ffffff;
+  opacity: 0.95;
+  margin-top: 0.25rem;
 }
 
 .trend-badge {
