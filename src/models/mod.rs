@@ -10,10 +10,15 @@ pub mod message;
 pub mod team_proposal;
 pub mod revenue_distribution;
 pub mod ai_matching;
+pub mod predictive_analytics;
 pub use ai_matching::{
     DynamicTeamSuggestion, TeamMemberProfile, CommunicationStyle,
     CollaborationHistory, TeamDynamics, SkillSynergyAnalysis,
     SkillPair, SkillGap, SkillOverlap, DynamicTeamRequest,
+};
+pub use predictive_analytics::{
+    ProjectRiskAssessment, RiskLevel, RiskFactor, PricingSuggestion,
+    PricingFactor, TimelineEstimation, TaskEstimate, TimelineFactor,
 };
 
 pub use self::user::*;

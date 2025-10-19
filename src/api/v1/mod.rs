@@ -17,6 +17,7 @@ pub mod review;
 pub mod team;
 pub mod agency;
 pub mod ai;
+pub mod predictive;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(auth::routes::config);
@@ -34,6 +35,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     team::routes::config(cfg);
     agency::routes::config(cfg);
     ai::routes::config(cfg);
+    predictive::routes::config(cfg);
 }
 
 pub use self::auth::*;
