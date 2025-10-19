@@ -107,3 +107,98 @@ pub struct MatchHistory {
     pub project_success: Option<bool>,
     pub created_at: NaiveDateTime,
 }
+
+// Dynamic Team Formation Models
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DynamicTeamSuggestion {
+    pub team_members: Vec<TeamMemberProfile>,
+    pub synergy_score: f64,
+    pub skill_coverage: f64,
+    pub collaboration_score: f64,
+    pub timezone_compatibility: f64,
+    pub communication_compatibility: f64,
+    pub estimated_success_rate: f64,
+    pub team_dynamics: TeamDynamics,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TeamMemberProfile {
+    pub freelancer_id: Uuid,
+    pub role: String,
+    pub skills: Vec<String>,
+    pub availability_score: f64,
+    pub timezone: String,
+    pub communication_style: CommunicationStyle,
+    pub past_team_success_rate: f64,
+    pub collaboration_history: Vec<CollaborationHistory>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum CommunicationStyle {
+    Proactive,
+    Responsive,
+    Detailed,
+    Concise,
+    Collaborative,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CollaborationHistory {
+    pub partner_id: Uuid,
+    pub project_count: i32,
+    pub success_rate: f64,
+    pub avg_rating: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TeamDynamics {
+    pub leadership_score: f64,
+    pub diversity_score: f64,
+    pub experience_balance: f64,
+    pub potential_conflicts: Vec<String>,
+    pub strengths: Vec<String>,
+}
+
+// Skill Synergy Models
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillSynergyAnalysis {
+    pub synergy_score: f64,
+    pub complementary_skills: Vec<SkillPair>,
+    pub skill_gaps: Vec<SkillGap>,
+    pub skill_overlaps: Vec<SkillOverlap>,
+    pub optimization_suggestions: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillPair {
+    pub skill_a: String,
+    pub skill_b: String,
+    pub synergy_level: f64,
+    pub reason: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillGap {
+    pub missing_skill: String,
+    pub importance: f64,
+    pub impact_on_project: String,
+    pub suggested_candidates: Vec<Uuid>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillOverlap {
+    pub skill: String,
+    pub redundancy_level: f64,
+    pub team_members_with_skill: Vec<Uuid>,
+    pub optimization_suggestion: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DynamicTeamRequest {
+    pub project_id: i32,
+    pub required_skills: Vec<String>,
+    pub max_team_size: Option<i32>,
+    pub budget_limit: Option<f64>,
+    pub timezone_preference: Option<String>,
+    pub prioritize_past_collaborations: bool,
+}

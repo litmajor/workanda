@@ -376,4 +376,376 @@ impl AIMatchingService {
         // Fetch available freelancers and convert to embeddings
         Ok(vec![])
     }
+
+    /// Dynamic Team Formation with AI-powered matching
+    pub async fn form_dynamic_team(
+        &self,
+        project_id: i32,
+        required_skills: Vec<String>,
+        max_team_size: i32,
+        budget_limit: Option<f64>,
+        timezone_preference: Option<String>,
+        prioritize_past_collaborations: bool,
+    ) -> Result<DynamicTeamSuggestion, sqlx::Error> {
+        let freelancers = self.get_available_freelancers().await?;
+        let project = self.get_project_embedding(project_id).await?;
+
+        // Calculate collaboration scores for all freelancer pairs
+        let collaboration_matrix = self.build_collaboration_matrix(&freelancers).await?;
+
+        // Find optimal team composition
+        let mut best_team = Vec::new();
+        let mut best_score = 0.0;
+
+        // Use greedy algorithm with backtracking for team selection
+        for seed_freelancer in &freelancers {
+            let mut current_team = vec![seed_freelancer.clone()];
+            let mut covered_skills = seed_freelancer.skills.clone();
+
+            while current_team.len() < max_team_size as usize {
+                let next_member = self.select_next_team_member(
+                    &current_team,
+                    &freelancers,
+                    &required_skills,
+                    &covered_skills,
+                    &collaboration_matrix,
+                    timezone_preference.as_deref(),
+                )?;
+
+                if let Some(member) = next_member {
+                    covered_skills.extend(member.skills.clone());
+                    current_team.push(member);
+                } else {
+                    break;
+                }
+            }
+
+            let team_score = self.calculate_team_score(
+                &current_team,
+                &required_skills,
+                &collaboration_matrix,
+                timezone_preference.as_deref(),
+            );
+
+            if team_score > best_score {
+                best_score = team_score;
+                best_team = current_team;
+            }
+        }
+
+        // Build team member profiles
+        let team_members: Vec<TeamMemberProfile> = best_team
+            .iter()
+            .map(|f| TeamMemberProfile {
+                freelancer_id: f.freelancer_id,
+                role: self.determine_role(&f.skills, &required_skills),
+                skills: f.skills.clone(),
+                availability_score: if f.availability { 1.0 } else { 0.5 },
+                timezone: f.timezone.clone(),
+                communication_style: CommunicationStyle::Collaborative, // Fetch from history
+                past_team_success_rate: f.completion_rate as f64,
+                collaboration_history: vec![],
+            })
+            .collect();
+
+        // Calculate synergy metrics
+        let synergy_analysis = self.analyze_skill_synergy(&best_team, &required_skills);
+        let skill_coverage = synergy_analysis.synergy_score;
+        
+        let collaboration_score = self.calculate_collaboration_score(&best_team, &collaboration_matrix);
+        let timezone_compatibility = self.calculate_timezone_compatibility(&best_team, timezone_preference.as_deref());
+        let communication_compatibility = 0.85; // Calculate from communication styles
+
+        let team_dynamics = self.analyze_team_dynamics(&best_team, &required_skills);
+
+        Ok(DynamicTeamSuggestion {
+            team_members,
+            synergy_score: synergy_analysis.synergy_score,
+            skill_coverage,
+            collaboration_score,
+            timezone_compatibility,
+            communication_compatibility,
+            estimated_success_rate: (synergy_analysis.synergy_score * 0.3 
+                + collaboration_score * 0.3 
+                + skill_coverage * 0.4),
+            team_dynamics,
+        })
+    }
+
+    /// Analyze skill synergy within a team
+    pub fn analyze_skill_synergy(
+        &self,
+        team: &[FreelancerEmbedding],
+        required_skills: &[String],
+    ) -> SkillSynergyAnalysis {
+        let mut all_team_skills: Vec<String> = team
+            .iter()
+            .flat_map(|f| f.skills.clone())
+            .collect();
+        all_team_skills.sort();
+        all_team_skills.dedup();
+
+        // Find complementary skills
+        let complementary_skills = self.find_complementary_skills(&all_team_skills);
+
+        // Identify skill gaps
+        let skill_gaps: Vec<SkillGap> = required_skills
+            .iter()
+            .filter(|s| !all_team_skills.contains(s))
+            .map(|s| SkillGap {
+                missing_skill: s.clone(),
+                importance: 0.8,
+                impact_on_project: format!("Critical skill {} is missing", s),
+                suggested_candidates: vec![],
+            })
+            .collect();
+
+        // Find skill overlaps
+        let mut skill_overlaps = Vec::new();
+        for skill in &all_team_skills {
+            let members_with_skill: Vec<Uuid> = team
+                .iter()
+                .filter(|f| f.skills.contains(skill))
+                .map(|f| f.freelancer_id)
+                .collect();
+
+            if members_with_skill.len() > 1 {
+                let redundancy = (members_with_skill.len() - 1) as f64 / team.len() as f64;
+                skill_overlaps.push(SkillOverlap {
+                    skill: skill.clone(),
+                    redundancy_level: redundancy,
+                    team_members_with_skill: members_with_skill,
+                    optimization_suggestion: if redundancy > 0.5 {
+                        format!("Consider replacing one member with {} skill", skill)
+                    } else {
+                        "Acceptable overlap for redundancy".to_string()
+                    },
+                });
+            }
+        }
+
+        let coverage = all_team_skills.iter().filter(|s| required_skills.contains(s)).count() as f64 
+            / required_skills.len() as f64;
+
+        let synergy_score = coverage * (1.0 - (skill_gaps.len() as f64 * 0.1))
+            * (1.0 + complementary_skills.len() as f64 * 0.05);
+
+        let optimization_suggestions = self.generate_optimization_suggestions(&skill_gaps, &skill_overlaps);
+
+        SkillSynergyAnalysis {
+            synergy_score: synergy_score.min(1.0),
+            complementary_skills,
+            skill_gaps,
+            skill_overlaps,
+            optimization_suggestions,
+        }
+    }
+
+    fn find_complementary_skills(&self, skills: &[String]) -> Vec<SkillPair> {
+        let synergies = vec![
+            (("React", "Node.js"), "Full-stack JavaScript development"),
+            (("Python", "Machine Learning"), "AI/ML development"),
+            (("UI/UX Design", "Frontend"), "Complete user experience"),
+            (("Backend", "DevOps"), "End-to-end deployment"),
+            (("Mobile", "API"), "Mobile application development"),
+        ];
+
+        let mut pairs = Vec::new();
+        for ((skill_a, skill_b), reason) in synergies {
+            if skills.iter().any(|s| s.contains(skill_a)) && skills.iter().any(|s| s.contains(skill_b)) {
+                pairs.push(SkillPair {
+                    skill_a: skill_a.to_string(),
+                    skill_b: skill_b.to_string(),
+                    synergy_level: 0.9,
+                    reason: reason.to_string(),
+                });
+            }
+        }
+        pairs
+    }
+
+    fn generate_optimization_suggestions(
+        &self,
+        gaps: &[SkillGap],
+        overlaps: &[SkillOverlap],
+    ) -> Vec<String> {
+        let mut suggestions = Vec::new();
+
+        if !gaps.is_empty() {
+            suggestions.push(format!("Add team member with skills: {}", 
+                gaps.iter().map(|g| g.missing_skill.as_str()).collect::<Vec<_>>().join(", ")));
+        }
+
+        for overlap in overlaps {
+            if overlap.redundancy_level > 0.4 {
+                suggestions.push(format!(
+                    "Reduce redundancy in {} - consider diversifying skills",
+                    overlap.skill
+                ));
+            }
+        }
+
+        if suggestions.is_empty() {
+            suggestions.push("Team composition is well-optimized".to_string());
+        }
+
+        suggestions
+    }
+
+    async fn build_collaboration_matrix(
+        &self,
+        freelancers: &[FreelancerEmbedding],
+    ) -> Result<HashMap<(Uuid, Uuid), f64>, sqlx::Error> {
+        let mut matrix = HashMap::new();
+        
+        // Query past collaborations from database
+        for i in 0..freelancers.len() {
+            for j in (i + 1)..freelancers.len() {
+                let score = self.get_collaboration_score(
+                    freelancers[i].freelancer_id,
+                    freelancers[j].freelancer_id,
+                ).await.unwrap_or(0.5);
+                
+                matrix.insert((freelancers[i].freelancer_id, freelancers[j].freelancer_id), score);
+                matrix.insert((freelancers[j].freelancer_id, freelancers[i].freelancer_id), score);
+            }
+        }
+        
+        Ok(matrix)
+    }
+
+    async fn get_collaboration_score(&self, freelancer_a: Uuid, freelancer_b: Uuid) -> Result<f64, sqlx::Error> {
+        // Query database for past team projects together
+        // For now, return default score
+        Ok(0.7)
+    }
+
+    fn select_next_team_member(
+        &self,
+        current_team: &[FreelancerEmbedding],
+        available: &[FreelancerEmbedding],
+        required_skills: &[String],
+        covered_skills: &[String],
+        collaboration_matrix: &HashMap<(Uuid, Uuid), f64>,
+        timezone_pref: Option<&str>,
+    ) -> Result<Option<FreelancerEmbedding>, sqlx::Error> {
+        let current_ids: Vec<Uuid> = current_team.iter().map(|f| f.freelancer_id).collect();
+        
+        let mut best_candidate = None;
+        let mut best_score = 0.0;
+
+        for candidate in available {
+            if current_ids.contains(&candidate.freelancer_id) {
+                continue;
+            }
+
+            // Calculate value added by this candidate
+            let new_skills: Vec<String> = candidate.skills
+                .iter()
+                .filter(|s| !covered_skills.contains(s) && required_skills.contains(s))
+                .cloned()
+                .collect();
+
+            let skill_value = new_skills.len() as f64 / required_skills.len() as f64;
+
+            // Calculate collaboration compatibility
+            let mut collab_score = 0.0;
+            for member in current_team {
+                collab_score += collaboration_matrix
+                    .get(&(member.freelancer_id, candidate.freelancer_id))
+                    .unwrap_or(&0.5);
+            }
+            collab_score /= current_team.len().max(1) as f64;
+
+            // Timezone compatibility
+            let timezone_score = if let Some(pref) = timezone_pref {
+                if candidate.timezone.contains(pref) { 1.0 } else { 0.5 }
+            } else {
+                1.0
+            };
+
+            let total_score = skill_value * 0.5 + collab_score * 0.3 + timezone_score * 0.2;
+
+            if total_score > best_score {
+                best_score = total_score;
+                best_candidate = Some(candidate.clone());
+            }
+        }
+
+        Ok(best_candidate)
+    }
+
+    fn calculate_team_score(
+        &self,
+        team: &[FreelancerEmbedding],
+        required_skills: &[String],
+        collaboration_matrix: &HashMap<(Uuid, Uuid), f64>,
+        timezone_pref: Option<&str>,
+    ) -> f64 {
+        let synergy = self.analyze_skill_synergy(team, required_skills);
+        let collab = self.calculate_collaboration_score(team, collaboration_matrix);
+        let timezone = self.calculate_timezone_compatibility(team, timezone_pref);
+
+        synergy.synergy_score * 0.4 + collab * 0.4 + timezone * 0.2
+    }
+
+    fn calculate_collaboration_score(
+        &self,
+        team: &[FreelancerEmbedding],
+        matrix: &HashMap<(Uuid, Uuid), f64>,
+    ) -> f64 {
+        if team.len() < 2 {
+            return 1.0;
+        }
+
+        let mut total = 0.0;
+        let mut count = 0;
+
+        for i in 0..team.len() {
+            for j in (i + 1)..team.len() {
+                total += matrix.get(&(team[i].freelancer_id, team[j].freelancer_id)).unwrap_or(&0.5);
+                count += 1;
+            }
+        }
+
+        if count > 0 { total / count as f64 } else { 0.5 }
+    }
+
+    fn calculate_timezone_compatibility(&self, team: &[FreelancerEmbedding], pref: Option<&str>) -> f64 {
+        if let Some(preferred) = pref {
+            let matching = team.iter().filter(|f| f.timezone.contains(preferred)).count();
+            matching as f64 / team.len() as f64
+        } else {
+            // Calculate timezone spread
+            let unique_timezones: std::collections::HashSet<_> = team.iter().map(|f| &f.timezone).collect();
+            if unique_timezones.len() <= 3 { 0.9 } else { 0.6 }
+        }
+    }
+
+    fn determine_role(&self, skills: &[String], required: &[String]) -> String {
+        for skill in skills {
+            if required.contains(skill) {
+                return skill.clone();
+            }
+        }
+        "Generalist".to_string()
+    }
+
+    fn analyze_team_dynamics(&self, team: &[FreelancerEmbedding], required: &[String]) -> TeamDynamics {
+        let avg_experience: f32 = team.iter().map(|f| f.experience_years).sum::<f32>() / team.len() as f32;
+        let experience_variance = team.iter()
+            .map(|f| (f.experience_years - avg_experience).powi(2))
+            .sum::<f32>() / team.len() as f32;
+
+        TeamDynamics {
+            leadership_score: team.iter().map(|f| f.experience_years).max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap_or(0.0) as f64 / 10.0,
+            diversity_score: (team.len() as f64).min(5.0) / 5.0,
+            experience_balance: 1.0 - (experience_variance.sqrt() as f64 / 10.0).min(1.0),
+            potential_conflicts: vec![],
+            strengths: vec![
+                "Diverse skill set".to_string(),
+                "Complementary expertise".to_string(),
+            ],
+        }
+    }
 }

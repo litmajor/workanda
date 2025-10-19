@@ -10,6 +10,11 @@ pub mod message;
 pub mod team_proposal;
 pub mod revenue_distribution;
 pub mod ai_matching;
+pub use ai_matching::{
+    DynamicTeamSuggestion, TeamMemberProfile, CommunicationStyle,
+    CollaborationHistory, TeamDynamics, SkillSynergyAnalysis,
+    SkillPair, SkillGap, SkillOverlap, DynamicTeamRequest,
+};
 
 pub use self::user::*;
 pub use self::job::*;

@@ -115,3 +115,42 @@ pub async fn suggest_team(
 
     Ok(HttpResponse::Ok().json(suggestion))
 }
+
+pub async fn form_dynamic_team(
+    pool: web::Data<PgPool>,
+    request: web::Json<DynamicTeamRequest>,
+) -> Result<HttpResponse, ApiError> {
+    let service = AIMatchingService::new(pool.get_ref().clone());
+    let max_team_size = request.max_team_size.unwrap_or(5);
+
+    let team_suggestion = service
+        .form_dynamic_team(
+            request.project_id,
+            request.required_skills.clone(),
+            max_team_size,
+            request.budget_limit,
+            request.timezone_preference.clone(),
+            request.prioritize_past_collaborations,
+        )
+        .await
+        .map_err(|e| ApiError::InternalServerError(e.to_string()))?;
+
+    Ok(HttpResponse::Ok().json(team_suggestion))
+}
+
+pub async fn analyze_skill_synergy(
+    pool: web::Data<PgPool>,
+    request: web::Json<DynamicTeamRequest>,
+) -> Result<HttpResponse, ApiError> {
+    let service = AIMatchingService::new(pool.get_ref().clone());
+    
+    // Fetch team members for the project
+    let freelancers = vec![]; // Fetch from database based on project_id
+    
+    let synergy_analysis = service.analyze_skill_synergy(
+        &freelancers,
+        &request.required_skills,
+    );
+
+    Ok(HttpResponse::Ok().json(synergy_analysis))
+}
