@@ -19,10 +19,10 @@ function Progress() {
     communication: [
       { name: 'Messaging System', progress: 100, status: 'complete' },
       { name: 'Notifications', progress: 100, status: 'complete' },
-      { name: 'Telegram Bot', progress: 60, status: 'in-progress' },
-      { name: 'Email Templates', progress: 50, status: 'in-progress' },
-      { name: 'WebSocket Support', progress: 70, status: 'in-progress' },
-      { name: 'File Sharing', progress: 60, status: 'in-progress' },
+      { name: 'Telegram Bot', progress: 100, status: 'complete' },
+      { name: 'Email Templates', progress: 100, status: 'complete' },
+      { name: 'WebSocket Support', progress: 100, status: 'complete' },
+      { name: 'File Sharing', progress: 100, status: 'complete' },
       { name: 'Video Calls', progress: 0, status: 'planned' }
     ],
     frontend: [
@@ -49,7 +49,7 @@ function Progress() {
     backend: 82,
     frontend: 95,
     deployment: 40,
-    combined: 90
+    combined: 88
   }
 
   const getStatusColor = (status) => {
