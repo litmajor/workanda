@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
 import './Analytics.css'
+import { EarningsChart, ProjectDistributionChart } from '../components/Chart'
 
 function Analytics() {
   const [timeRange, setTimeRange] = useState('30days')
@@ -11,6 +12,22 @@ function Analytics() {
     averageRating: 4.8,
     successRate: 96
   }
+
+  const earningsData = [
+    { month: 'Jan', earnings: 3200 },
+    { month: 'Feb', earnings: 4100 },
+    { month: 'Mar', earnings: 3800 },
+    { month: 'Apr', earnings: 5200 },
+    { month: 'May', earnings: 4800 },
+    { month: 'Jun', earnings: 6100 }
+  ]
+
+  const projectDistribution = [
+    { name: 'Web Dev', value: 12 },
+    { name: 'Mobile', value: 8 },
+    { name: 'Design', value: 5 },
+    { name: 'Marketing', value: 3 }
+  ]
 
   return (
     <div className="analytics-page">
@@ -70,17 +87,11 @@ function Analytics() {
         <div className="charts-grid">
           <div className="chart-card">
             <h3>Earnings Overview</h3>
-            <div className="chart-placeholder">
-              <p>📈 Earnings chart visualization</p>
-              <p className="chart-note">Chart integration coming soon</p>
-            </div>
+            <EarningsChart data={earningsData} />
           </div>
           <div className="chart-card">
             <h3>Project Distribution</h3>
-            <div className="chart-placeholder">
-              <p>📊 Project breakdown by category</p>
-              <p className="chart-note">Chart integration coming soon</p>
-            </div>
+            <ProjectDistributionChart data={projectDistribution} />
           </div>
         </div>
 

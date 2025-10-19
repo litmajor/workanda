@@ -1,6 +1,8 @@
 
 import './Input.css'
 
+export { FileUpload } from './FileUpload'
+
 export function TextInput({ label, error, ...props }) {
   return (
     <div className="input-group">

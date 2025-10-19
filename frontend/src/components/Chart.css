@@ -1,0 +1,17 @@
+
+.recharts-wrapper {
+  font-family: inherit;
+}
+
+.recharts-text {
+  fill: var(--text-secondary);
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--border-color);
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
