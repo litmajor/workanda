@@ -17,6 +17,7 @@ import Settings from './pages/Settings'
 import Notifications from './pages/Notifications'
 import Teams from './pages/Teams'
 import Analytics from './pages/Analytics'
+import TrustSafety from './pages/TrustSafety'
 import AIMatching from './pages/AIMatching'
 import ProposalAssistant from './pages/ProposalAssistant'
 import FreelancerProfileSetup from './pages/FreelancerProfileSetup'
@@ -40,6 +41,7 @@ function App() {
               <Link to="/ai/matching" className="nav-link">AI Matching</Link>
               <Link to="/dashboard" className="nav-link">Dashboard</Link>
               <Link to="/escrow" className="nav-link">Payments</Link>
+              <Link to="/trust-safety" className="nav-link">Trust & Safety</Link>
               <Link to="/profile" className="nav-link">Profile</Link>
               <ThemeToggle />
               <Link to="/login" className="btn btn-primary nav-btn">Login</Link>
@@ -78,6 +80,9 @@ function App() {
           {/* Team & Collaboration Routes */}
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/:id" element={<Teams />} />
+          
+          {/* Trust & Safety */}
+          <Route path="/trust-safety" element={<TrustSafety />} />
           
           {/* Review & Rating Routes */}
           <Route path="/reviews" element={<Reviews />} />

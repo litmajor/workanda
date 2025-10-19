@@ -1,10 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import Chart from '../components/Chart'
+import EmptyState from '../components/EmptyState'
+import Skeleton from '../components/Skeleton'
 import './Projects.css'
 
 function Projects() {
   const { id } = useParams()
   const [activeTab, setActiveTab] = useState('overview')
+  const [loading, setLoading] = useState(false)
+  const [showTaskModal, setShowTaskModal] = useState(false)
 
   const projects = [
     {
@@ -161,6 +166,46 @@ function Projects() {
                   </div>
                   <span className="progress-text">{currentProject.progress}% Complete</span>
                 </div>
+                
+                <div className="progress-analytics">
+                  <Chart
+                    data={[
+                      { name: 'Week 1', progress: 15 },
+                      { name: 'Week 2', progress: 30 },
+                      { name: 'Week 3', progress: 50 },
+                      { name: 'Week 4', progress: currentProject.progress }
+                    ]}
+                    dataKey="progress"
+                    color="#4f46e5"
+                  />
+                </div>
+              </div>
+
+              <div className="section-card">
+                <div className="section-header">
+                  <h3>Active Tasks</h3>
+                  <button className="btn btn-small btn-primary" onClick={() => setShowTaskModal(true)}>
+                    + Add Task
+                  </button>
+                </div>
+                <div className="tasks-list">
+                  <div className="task-item">
+                    <input type="checkbox" />
+                    <div className="task-content">
+                      <h4>Design homepage layout</h4>
+                      <span className="task-meta">Due: Dec 20 • Priority: High</span>
+                    </div>
+                    <span className="task-assignee">JD</span>
+                  </div>
+                  <div className="task-item completed">
+                    <input type="checkbox" checked />
+                    <div className="task-content">
+                      <h4>Set up database schema</h4>
+                      <span className="task-meta">Completed: Dec 15</span>
+                    </div>
+                    <span className="task-assignee">SC</span>
+                  </div>
+                </div>
               </div>
 
               <div className="section-card">
@@ -169,6 +214,7 @@ function Projects() {
                   <button className="btn btn-primary">Submit Work</button>
                   <button className="btn btn-secondary">Request Payment</button>
                   <Link to="/messages" className="btn btn-secondary">Message Client</Link>
+                  <Link to="/time-tracking" className="btn btn-secondary">Track Time</Link>
                 </div>
               </div>
             </div>

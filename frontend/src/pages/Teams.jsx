@@ -1,9 +1,13 @@
 
 import { useState } from 'react'
+import Chart from '../components/Chart'
+import Modal from '../components/Modal'
 import './Teams.css'
 
 function Teams() {
   const [activeTab, setActiveTab] = useState('my-teams')
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [selectedTeam, setSelectedTeam] = useState(null)
 
   const teams = [
     {
@@ -40,7 +44,7 @@ function Teams() {
             <h1>Teams</h1>
             <p>Collaborate with your team members</p>
           </div>
-          <button className="btn btn-primary">Create New Team</button>
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>Create New Team</button>
         </div>
 
         <div className="teams-tabs">
@@ -55,6 +59,12 @@ function Teams() {
             onClick={() => setActiveTab('invitations')}
           >
             Invitations
+          </button>
+          <button
+            className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            Analytics
           </button>
         </div>
 
@@ -120,7 +130,72 @@ function Teams() {
             </div>
           </div>
         )}
+
+        {activeTab === 'analytics' && (
+          <div className="teams-content">
+            <div className="section-card">
+              <h3>Team Performance</h3>
+              <Chart
+                data={[
+                  { name: 'Jan', projects: 4, revenue: 12000 },
+                  { name: 'Feb', projects: 5, revenue: 15000 },
+                  { name: 'Mar', projects: 6, revenue: 18000 },
+                  { name: 'Apr', projects: 8, revenue: 24000 }
+                ]}
+                dataKey="revenue"
+                color="#10b981"
+              />
+            </div>
+
+            <div className="stats-grid">
+              <div className="stat-card">
+                <span className="stat-label">Total Projects</span>
+                <span className="stat-value">23</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Success Rate</span>
+                <span className="stat-value">94%</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Avg Response Time</span>
+                <span className="stat-value">2.4h</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-label">Client Satisfaction</span>
+                <span className="stat-value">4.8/5</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {showCreateModal && (
+        <Modal onClose={() => setShowCreateModal(false)}>
+          <h2>Create New Team</h2>
+          <form className="team-form">
+            <div className="form-group">
+              <label>Team Name</label>
+              <input type="text" placeholder="Enter team name" required />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea placeholder="What does your team specialize in?" rows="3"></textarea>
+            </div>
+            <div className="form-group">
+              <label>Skills</label>
+              <input type="text" placeholder="e.g., React, Node.js, UI/UX" />
+            </div>
+            <div className="modal-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary">
+                Create Team
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   )
 }
