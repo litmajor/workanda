@@ -3,7 +3,9 @@ use actix_web::{web, HttpResponse};
 use sqlx::PgPool;
 use uuid::Uuid;
 use crate::models::ai_matching::*;
+use crate::models::proposal_assistant::*;
 use crate::services::ai_matching_service::AIMatchingService;
+use crate::services::proposal_assistant_service::ProposalAssistantService;
 use crate::api::error::ApiError;
 
 pub async fn get_matches_for_freelancer(
@@ -153,4 +155,46 @@ pub async fn analyze_skill_synergy(
     );
 
     Ok(HttpResponse::Ok().json(synergy_analysis))
+}
+
+pub async fn analyze_proposal(
+    pool: web::Data<PgPool>,
+    request: web::Json<ProposalAnalysisRequest>,
+) -> Result<HttpResponse, ApiError> {
+    let service = ProposalAssistantService::new(pool.get_ref().clone());
+    
+    let analysis = service
+        .analyze_proposal(request.into_inner())
+        .await
+        .map_err(|e| ApiError::InternalServerError(e.to_string()))?;
+    
+    Ok(HttpResponse::Ok().json(analysis))
+}
+
+pub async fn categorize_job(
+    pool: web::Data<PgPool>,
+    job_id: web::Path<i32>,
+) -> Result<HttpResponse, ApiError> {
+    let service = ProposalAssistantService::new(pool.get_ref().clone());
+    
+    let categorization = service
+        .categorize_job(*job_id)
+        .await
+        .map_err(|e| ApiError::InternalServerError(e.to_string()))?;
+    
+    Ok(HttpResponse::Ok().json(categorization))
+}
+
+pub async fn smart_search(
+    pool: web::Data<PgPool>,
+    request: web::Json<SmartSearchRequest>,
+) -> Result<HttpResponse, ApiError> {
+    let service = ProposalAssistantService::new(pool.get_ref().clone());
+    
+    let results = service
+        .smart_search(request.into_inner())
+        .await
+        .map_err(|e| ApiError::InternalServerError(e.to_string()))?;
+    
+    Ok(HttpResponse::Ok().json(results))
 }
